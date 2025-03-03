@@ -1,63 +1,74 @@
-<html>
 {% extends 'base.html' %}
 {% block pagetitle %}
 PlantVision
 {% endblock pagetitle %}
 
 {% block body %}
-<div>
-    <div class="container">
-        <div class="row mb-5 text-center text-white">
-            <div class="col-lg-10 mx-auto">
-                <h1 class="display-4" style="padding-top: 2%;font-weight: 400;color: rgb(4, 54, 4);"><b>🍀PLANT VISION🍀</b></h1>
-                <p class="lead" style="font-weight: 500;color: black;">Let PlantVision Help You To Detect Disease</p>
+<style>
+    body {
+        overflow-x: hidden;
+    }
+    @media (max-width: 768px) {
+        .col {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+    }
+    #captured-image {
+        width: 100%;
+        max-height: 300px;
+        object-fit: contain;
+        border-radius: 10px;
+    }
+</style>
+<div class="container py-4">
+    <div class="row mb-5 text-center">
+        <div class="col-lg-10 mx-auto">
+            <h1 class="display-4" style="padding-top: 2%; font-weight: 400; color: rgb(4, 54, 4);"><b>🍀PLANT VISION🍀</b></h1>
+            <p class="lead" style="font-weight: 500; color: black;">Let PlantVision Help You To Detect Disease</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="p-4 bg-white shadow rounded-lg">
+                <h5><b>Why is it necessary to detect disease in plants?</b></h5>
+                <p>Plant diseases affect the growth of their respective species. Proper disease diagnosis is necessary to prevent plant losses and optimize disease control measures.</p>
             </div>
         </div>
-        <div class="row">
-            <div class="col mx-auto">
-                <div class="p-5 bg-white shadow rounded-lg" style="height: 95%;">
-                    <h5><b>Why is it necessary to detect disease in plants?</b></h5>
-                    <p>Plant diseases affect the growth of their respective species. Proper disease diagnosis is necessary to prevent plant losses and optimize disease control measures.</p>
-                </div>
+        <div class="col-md-4">
+            <div class="p-4 bg-white shadow rounded-lg">
+                <form action="/submit" method="POST" enctype="multipart/form-data">
+                    <div class="d-flex justify-content-center align-items-center gap-2 mb-2">
+                        <input type="file" id="actual-btn" hidden name="image" accept="image/*" />
+                        <label for="actual-btn" class="btn btn-outline-secondary">Upload</label>
+                        <span>or</span>
+                        <button type="button" id="capture-btn" class="btn btn-outline-secondary">Capture</button>
+                    </div>
+                    <span id="file-chosen">No file chosen</span>
+                    <div class="text-center">
+                        <video id="camera-preview" width="100%" height="300" autoplay playsinline style="display: none; border-radius: 10px;"></video>
+                        <canvas id="captured-image" style="display: none;"></canvas>
+                        <button type="button" id="take-photo" class="btn btn-success mt-2" style="display: none;">Take Shot</button>
+                    </div>
+                    <input type="hidden" id="captured-image-data" name="captured_image">
+                    <center>
+                        <button type="submit" class="btn btn-outline-success mt-4">Submit</button>
+                    </center>
+                </form>
             </div>
-            <div class="col mx-auto">
-                <div class="p-5 bg-white shadow rounded-lg" style="height: 95%;">
-                    
-                    <form action="/submit" method="POST" enctype="multipart/form-data">
-                        <div class="d-flex justify-content-center align-items-center gap-2 mb-2">
-                            <input type="file" id="actual-btn" hidden name="image" accept="image/*" />
-                            <label for="actual-btn" class="btn btn-outline-secondary">Upload</label>
-                            <span>or</span>
-                            <button type="button" id="capture-btn" class="btn btn-outline-secondary">Capture</button>
-                        </div>
-                         <span id="file-chosen">No file chosen</span>
-                        <div class="text-center">
-                            <video id="camera-preview" width="100%" height="300" autoplay playsinline style="display: none; border-radius: 10px;"></video>
-                            <canvas id="captured-image" style="display: none;"></canvas>
-                            <button type="button" id="take-photo" class="btn btn-success mt-2" style="display: none;">Take Shot</button>
-                        </div>
-                        
-                        <input type="hidden" id="captured-image-data" name="captured_image">
-                        
-                        <center>
-                            <button type="submit" class="btn btn-outline-success mt-4">Submit</button>
-                        </center>
-                    </form>
-                </div>
-            </div>
-            <div class="col mx-auto">
-                <div class="p-5 bg-white shadow rounded-lg" style="height: 95%;">
-                    <h5><b>Prevent Plant Disease by following these steps:</b></h5>
-                    <ol>
-                        <li>Follow Good Sanitation Practices.</li>
-                        <li>Fertilize to Keep Your Plants Healthy.</li>
-                        <li>Inspect Plants for Diseases Before You Bring Them Home.</li>
-                        <li>Allow the Soil to Warm Before Planting.</li>
-                        <li>Rotate Crops Regularly.</li>
-                        <li>Ensure Good Air Circulation.</li>
-                        <li>Remove Diseased Stems and Foliage.</li>
-                    </ol>
-                </div>
+        </div>
+        <div class="col-md-4">
+            <div class="p-4 bg-white shadow rounded-lg">
+                <h5><b>Prevent Plant Disease by following these steps:</b></h5>
+                <ol>
+                    <li>Follow Good Sanitation Practices.</li>
+                    <li>Fertilize to Keep Your Plants Healthy.</li>
+                    <li>Inspect Plants for Diseases Before You Bring Them Home.</li>
+                    <li>Allow the Soil to Warm Before Planting.</li>
+                    <li>Rotate Crops Regularly.</li>
+                    <li>Ensure Good Air Circulation.</li>
+                    <li>Remove Diseased Stems and Foliage.</li>
+                </ol>
             </div>
         </div>
     </div>
@@ -80,29 +91,30 @@ PlantVision
     captureBtn.addEventListener('click', async function () {
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
             try {
-                videoStream = await navigator.mediaDevices.getUserMedia({ video: true });
+                videoStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
                 cameraPreview.srcObject = videoStream;
                 cameraPreview.style.display = 'block';
                 takePhotoBtn.style.display = 'block';
                 cameraPreview.play();
             } catch (err) {
-                console.error("Error accessing camera: ", err);
+                alert("Error accessing camera: " + err);
             }
         }
     });
 
     takePhotoBtn.addEventListener('click', function () {
         const context = capturedCanvas.getContext('2d');
-        capturedCanvas.width = cameraPreview.videoWidth;
-        capturedCanvas.height = cameraPreview.videoHeight;
-        context.drawImage(cameraPreview, 0, 0, cameraPreview.videoWidth, cameraPreview.videoHeight);
+        capturedCanvas.width = 300;
+        capturedCanvas.height = 300;
+        context.drawImage(cameraPreview, 0, 0, 300, 300);
         capturedImageData.value = capturedCanvas.toDataURL('image/png');
         capturedCanvas.style.display = 'block';
         cameraPreview.style.display = 'none';
         takePhotoBtn.style.display = 'none';
-        videoStream.getTracks().forEach(track => track.stop());
+        if (videoStream) {
+            videoStream.getTracks().forEach(track => track.stop());
+        }
     });
 </script>
 
 {% endblock body %}
-</html>

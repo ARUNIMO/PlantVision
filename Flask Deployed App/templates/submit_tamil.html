@@ -2,40 +2,57 @@
 {% block pagetitle %}
 {{ title }}
 {% endblock pagetitle %}
-{% block body %}
 
-<div>
-  <div class="container">
-    <!-- For demo purpose -->
-    <div class="row mb-5 text-center text-white">
-      <div class="col-lg-10 mx-auto">
-        <h1 class="display-4" style="padding-top: 2%;font-weight: 400;color: rgb(4, 54, 4);""><b>{{ title }}🍂</b></h1>
-      </div>
+{% block body %}
+<div class="container">
+  <!-- Title Section -->
+  <div class="row mb-4 text-center">
+    <div class="col-lg-10 mx-auto">
+      <h1 class="display-4" style="padding-top: 2%; font-weight: 400; color: rgb(4, 54, 4);">
+        <b>{{ title }} 🍂</b>
+      </h1>
     </div>
-    <center>
-      <div class="col">
-        <div class="p-3 bg-white shadow rounded-lg" style="width: 30%;">
-          <img src={{ image_url }} width="350" height="350">
-        </div>
-      </div>
-    </center>
-    <br>
-    <div class="row">
-      <div class="col mx-auto">
-        <div class="p-5 bg-white shadow rounded-lg" style="height: 95%;">
-          <h5><b>விளக்கம்:</b></h5>
-          <p>{{ desc }}</p>
-        </div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col mx-auto">
-        <div class="p-5 bg-white shadow rounded-lg" style="height: 95%">
-          <h5><b>கண்ணியமாக இதை முன்னிட்டு, எச்சரிக்கை:</b></h5>
-          <p>{{ prevent }}</p>
-        </div>
+  </div>
+
+  <!-- Image Display Section -->
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4">
+      <div class="p-3 bg-white shadow rounded-lg text-center">
+        <img src="{{ image_url }}" class="img-fluid rounded" alt="Plant Image">
       </div>
     </div>
   </div>
+
+  <br>
+
+  <!-- Description Section -->
+  <div class="row justify-content-center">
+    <div class="col-md-10">
+      <div class="p-4 bg-white shadow rounded-lg">
+        <h5><b>விளக்கம்:</b></h5>
+        <p>{{ desc }}</p>
+      </div>
+    </div>
+  </div>
+
+  <br>
+
+  <!-- Prevention Section -->
+  <div class="row justify-content-center">
+    <div class="col-md-10">
+      <div class="p-4 bg-white shadow rounded-lg">
+        <h5><b>கண்ணியமாக இதை முன்னிட்டு, எச்சரிக்கை:</b></h5>
+        <p>{{ prevent }}</p>
+      </div>
+    </div>
+  </div>
+
+    <!-- View in Tamil Button -->
+    <div class="row justify-content-center">
+      <div class="col-md-6 text-center">
+          <button type="submit" class="btn btn-primary w-100">View in English</button>
+      </div>
+    </div>
+
 </div>
 {% endblock body %}

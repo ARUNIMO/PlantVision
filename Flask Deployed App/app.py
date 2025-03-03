@@ -121,5 +121,5 @@ def submit_tamil():
         return render_template('submit_tamil.html', title=title_tamil, desc=description_tamil,
                                prevent=prevent_tamil, image_url=image_url_tamil, pred=pred)
 
-if __name__ == '__main__':
-    app.run(debug=True)
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=8080, debug=True)

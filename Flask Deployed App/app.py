@@ -1,19 +1,18 @@
 import os
 from flask import Flask, redirect, render_template, request
 from PIL import Image
-import torchvision.transforms.functional as TF
 import torch
 import numpy as np
 import pandas as pd
-from torchvision import transforms
-from torch.autograd import Variable
+import torchvision
+import torch.autograd
 
 # Load disease and supplement information
-disease_info = pd.read_csv('disease_info.csv', encoding='cp1252')
-supplement_info = pd.read_csv('supplement_info.csv', encoding='cp1252')
+disease_info = pd.read_csv(os.path.join(os.path.dirname(__file__), 'disease_info.csv'), encoding='cp1252')
+supplement_info = pd.read_csv(os.path.join(os.path.dirname(__file__), 'supplement_info.csv'), encoding='cp1252')
 
 # Load Tamil disease information
-tamil_disease_info = pd.read_csv('disease_info_tamil.csv', on_bad_lines='skip')
+tamil_disease_info = pd.read_csv(os.path.join(os.path.dirname(__file__), 'disease_info_tamil.csv'), on_bad_lines='skip')
 
 
 # Model loading using ResNet-50
@@ -53,24 +52,25 @@ def ConvBlock(in_channels, out_channels, pool=False):
     return torch.nn.Sequential(*layers)
 
 # Load the trained model
+model_path = os.path.join(os.path.dirname(__file__), 'plant-disease-model.pth')
 model = ResNet50(3, 38)
-model.load_state_dict(torch.load("plant-disease-model_1.pth"))
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+model.load_state_dict(torch.load(model_path, map_location=device))
+model.to(device)
 model.eval()
 
 def transform_image(image_path):
-    transform = transforms.Compose([transforms.Resize((256, 256)),
-                                    transforms.ToTensor()])
+    transform = torchvision.transforms.Compose([torchvision.transforms.Resize((256, 256)),
+                                                torchvision.transforms.ToTensor()])
     image = Image.open(image_path)
     return transform(image).unsqueeze(0)
 
 def prediction(image_path):
     input_data = transform_image(image_path)
-    input_data = Variable(input_data).to('cuda')
-    model.to('cuda')
+    input_data = torch.autograd.Variable(input_data).to(device)
     output = model(input_data)
-    output = output.detach().cpu().numpy()
-    index = np.argmax(output)
-    return index
+    _, predicted = torch.max(output, 1)
+    return predicted.item()
 
 # Initialize Flask App
 app = Flask(__name__)
@@ -94,8 +94,7 @@ def submit():
     if request.method == 'POST':
         image = request.files['image']
         filename = image.filename
-        file_path = os.path.join('static/uploads', filename)
-        file=file_path
+        file_path = os.path.join(os.path.dirname(__file__), 'static/uploads', filename)       
         image.save(file_path)
         pred = prediction(file_path)
         global pred1

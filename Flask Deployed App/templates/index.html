@@ -7,69 +7,55 @@ PlantVision
 {% block body %}
 <div>
     <div class="container">
-        <!-- For demo purpose -->
         <div class="row mb-5 text-center text-white">
             <div class="col-lg-10 mx-auto">
                 <h1 class="display-4" style="padding-top: 2%;font-weight: 400;color: rgb(4, 54, 4);"><b>🍀PLANT VISION🍀</b></h1>
                 <p class="lead" style="font-weight: 500;color: black;">Let PlantVision Help You To Detect Disease</p>
             </div>
         </div>
-        <!-- End -->
-        <div class="row ">
+        <div class="row">
             <div class="col mx-auto">
                 <div class="p-5 bg-white shadow rounded-lg" style="height: 95%;">
-
-                    <h5><b>Why is it necessary to detect disease in plant ?</b></h5>
-                    <p>Plant diseases affect the growth of their respective species. In addition, some research gaps are
-                        identified from which to obtain greater transparency for detecting diseases in plants, even
-                        before their symptoms appear clearly.
-                        diagnosis is one of the most important aspects of a plant pathologist's training. Without proper
-                        identification of the disease and the disease-causing agent, disease control measures can be a
-                        waste of time and money and can lead to further plant losses. Proper disease diagnosis is
-                        necessary.
-                    </p>
+                    <h5><b>Why is it necessary to detect disease in plants?</b></h5>
+                    <p>Plant diseases affect the growth of their respective species. Proper disease diagnosis is necessary to prevent plant losses and optimize disease control measures.</p>
                 </div>
             </div>
             <div class="col mx-auto">
-                <div class="p-5 bg-white shadow rounded-lg" style="height: 95%;"><img
-                        src="https://www.pngjoy.com/pngl/250/4840262_plants-png-indoors-tropical-plant-png-hd-png.png "
-                        heig    ht="300" alt="" width="200" class="d-block mx-auto mb-4 rounded-pill">
-
-                    <!-- Default bootstrap file upload-->
-
+                <div class="p-5 bg-white shadow rounded-lg" style="height: 95%;">
+                    
                     <form action="/submit" method="POST" enctype="multipart/form-data">
-                        <div class="custom-file overflow-hidden mb-4">
-                            <input type="file" id="actual-btn" hidden name="image" />
-                            <label for="actual-btn">Choose File</label>
-                            <span id="file-chosen">No file chosen</span>
+                        <div class="d-flex justify-content-center align-items-center gap-2 mb-2">
+                            <input type="file" id="actual-btn" hidden name="image" accept="image/*" />
+                            <label for="actual-btn" class="btn btn-outline-secondary">Upload</label>
+                            <span>or</span>
+                            <button type="button" id="capture-btn" class="btn btn-outline-secondary">Capture</button>
                         </div>
-
-                        <!-- End -->
-
-                        <h6 class="text-center mb-4 text-muted">
-                            Simply upload your plant's leaf image and then see the magic of AI.
-                        </h6>
-
-                        <!-- Custom bootstrap upload file-->
+                         <span id="file-chosen">No file chosen</span>
+                        <div class="text-center">
+                            <video id="camera-preview" width="100%" height="300" autoplay playsinline style="display: none; border-radius: 10px;"></video>
+                            <canvas id="captured-image" style="display: none;"></canvas>
+                            <button type="button" id="take-photo" class="btn btn-success mt-2" style="display: none;">Take Shot</button>
+                        </div>
+                        
+                        <input type="hidden" id="captured-image-data" name="captured_image">
+                        
                         <center>
-                            <a class="mx-2"><button type="submit" class="btn btn-outline-success">Submit</button></a>
+                            <button type="submit" class="btn btn-outline-success mt-4">Submit</button>
                         </center>
                     </form>
-                    <!-- End -->
-
                 </div>
             </div>
             <div class="col mx-auto">
                 <div class="p-5 bg-white shadow rounded-lg" style="height: 95%;">
-                    <h5><b>Prevent Plant Disease follow below steps:</b></h5>
+                    <h5><b>Prevent Plant Disease by following these steps:</b></h5>
                     <ol>
                         <li>Follow Good Sanitation Practices.</li>
                         <li>Fertilize to Keep Your Plants Healthy.</li>
                         <li>Inspect Plants for Diseases Before You Bring Them Home.</li>
                         <li>Allow the Soil to Warm Before Planting.</li>
-                        <li>Ensure a Healthy Vegetable Garden By Rotating Crops.</li>
-                        <li>Provide Good Air Circulation</li>
-                        <li>Remove Diseased Stems and Foliage</li>
+                        <li>Rotate Crops Regularly.</li>
+                        <li>Ensure Good Air Circulation.</li>
+                        <li>Remove Diseased Stems and Foliage.</li>
                     </ol>
                 </div>
             </div>
@@ -79,12 +65,44 @@ PlantVision
 
 <script>
     const actualBtn = document.getElementById('actual-btn');
-
     const fileChosen = document.getElementById('file-chosen');
+    const captureBtn = document.getElementById('capture-btn');
+    const cameraPreview = document.getElementById('camera-preview');
+    const takePhotoBtn = document.getElementById('take-photo');
+    const capturedCanvas = document.getElementById('captured-image');
+    const capturedImageData = document.getElementById('captured-image-data');
 
     actualBtn.addEventListener('change', function () {
-        fileChosen.textContent = this.files[0].name
-    })
+        fileChosen.textContent = this.files[0].name;
+    });
+
+    let videoStream;
+    captureBtn.addEventListener('click', async function () {
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            try {
+                videoStream = await navigator.mediaDevices.getUserMedia({ video: true });
+                cameraPreview.srcObject = videoStream;
+                cameraPreview.style.display = 'block';
+                takePhotoBtn.style.display = 'block';
+                cameraPreview.play();
+            } catch (err) {
+                console.error("Error accessing camera: ", err);
+            }
+        }
+    });
+
+    takePhotoBtn.addEventListener('click', function () {
+        const context = capturedCanvas.getContext('2d');
+        capturedCanvas.width = cameraPreview.videoWidth;
+        capturedCanvas.height = cameraPreview.videoHeight;
+        context.drawImage(cameraPreview, 0, 0, cameraPreview.videoWidth, cameraPreview.videoHeight);
+        capturedImageData.value = capturedCanvas.toDataURL('image/png');
+        capturedCanvas.style.display = 'block';
+        cameraPreview.style.display = 'none';
+        takePhotoBtn.style.display = 'none';
+        videoStream.getTracks().forEach(track => track.stop());
+    });
 </script>
 
 {% endblock body %}
+</html>

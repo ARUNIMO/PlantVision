@@ -99,6 +99,7 @@ def submit():
         pred = prediction(file_path)
         global pred1
         pred1=pred
+        print(pred)
         title = disease_info['disease_name'][pred]
         description = disease_info['description'][pred]
         prevent = disease_info['Possible Steps'][pred]
@@ -113,7 +114,9 @@ def submit():
 @app.route('/submit_tamil', methods=['GET', 'POST'])
 def submit_tamil():
     if request.method == 'POST':
+        global pred1
         pred = pred1
+        print(pred)
         title_tamil = tamil_disease_info['disease_name'][pred]
         description_tamil = tamil_disease_info['description'][pred]
         prevent_tamil = tamil_disease_info['Possible Steps'][pred]
